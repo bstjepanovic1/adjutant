@@ -1,6 +1,8 @@
 import os
+
 from adjutant.template import compile_template, render_template
 from adjutant.utility import ensure_path
+
 
 class Builder:
 	def __init__(self, basepath, config):
@@ -32,6 +34,7 @@ class Builder:
 		content = render_template(makefile_tpl, {
 			"BUILD_PATH": self.build_path,
 			"TEMPLATE_PATH": self.template_src_path,
+			"config": self.config,
 		})
 		with open(makefile, "w") as f:
 			f.write(content)

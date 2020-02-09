@@ -8,10 +8,18 @@ Requires Python3 and Make.
 
 ## Usage
 
-To process single file use command:
+In your source code directory use init command to create configuration file:
 
+```bash
+adjutant init
 ```
-adjutant src/header.h -t src/_templates -o build/adj
+
+Setup will ask you where to look for source files and where to perform build.
+
+To build your project use:
+
+```bash
+adjutant build
 ```
 
 ## Development
