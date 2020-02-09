@@ -2,7 +2,6 @@ import os
 import glob
 
 from adjutant.utility import ensure_path, DotDict
-from adjutant.template import Template
 
 
 class ProcessorContext:

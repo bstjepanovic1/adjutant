@@ -1,8 +1,9 @@
 # (c) 2014-2019 Paul Sokolovsky. MIT license.
+# original filename utemplate.py from https://github.com/pfalcon/utemplate
 # Modified by Boban Stjepanovic
 
 import os
-from adjutant.utility import import_file, ensure_path
+from adjutant.utility import import_file, ensure_path, DotDict
 
 
 class Compiler:
@@ -144,28 +145,15 @@ class Compiler:
 		self.close_literal()
 		return self.seq
 
-class Template:
-	def __init__(self, name, src, compiled, force=False):
-		if True or not os.path.exists(compiled) or force:
-			if not os.path.exists(src):
-				raise ValueError("Missing template source `{0}`!".format(src))
-			src_f = open(src, "r")
-			ensure_path(os.path.dirname(compiled))
-			dest_f = open(compiled, "w")
-			compiler = Compiler(src_f, dest_f, loader=self)
-			compiler.args = 'PP, data, **kwargs'
-			compiler.compile()
-			src_f.close()
-			dest_f.close()
-		self.tpl = import_file(compiled, name)
-		self.invalid = False
-
-	def render(self, context, data):
-		data = DotDict(data)
-		content = ""
-		for line in self.tpl.render(context, data):
-			content += line
-		return content
+def render_template(filename, data, context=None):
+	tpl = import_file(filename)
+	if not tpl:
+		raise ValueError("Template not found `{0}`!".format(filename))
+	data = DotDict(data)
+	content = ""
+	for line in tpl.render(context, data):
+		content += line
+	return content
 
 def compile_template(src, dest):
 	if not os.path.exists(src):

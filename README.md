@@ -4,7 +4,7 @@ Python tool for source code generation and processing.
 
 ## Installation
 
-Requires Python3 and GNU Make.
+Requires Python3 and Make.
 
 ## Usage
 
