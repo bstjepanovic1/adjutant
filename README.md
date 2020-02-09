@@ -2,7 +2,13 @@
 
 Python tool for source code generation and processing.
 
+## Installation
+
+Requires Python3 and GNU Make.
+
 ## Usage
+
+To process single file use command:
 
 ```
 adjutant src/header.h -t src/_templates -o build/adj
