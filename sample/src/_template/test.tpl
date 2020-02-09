@@ -1,0 +1,1 @@
+{{ ADJ.output('test-out') }}
