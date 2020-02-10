@@ -1,8 +1,9 @@
 # (c) 2014-2019 Paul Sokolovsky. MIT license.
-# original filename utemplate.py from https://github.com/pfalcon/utemplate
+# original file utemplate.py from https://github.com/pfalcon/utemplate
 # Modified by Boban Stjepanovic
 
 import os
+from adjutant import config
 from adjutant.utility import import_file, ensure_path, DotDict
 
 
@@ -151,7 +152,7 @@ def render_template(filename, data, context=None):
 		raise ValueError("Template not found `{0}`!".format(filename))
 	data = DotDict(data)
 	content = ""
-	for line in tpl.render(context, data):
+	for line in tpl.render(data, context, config):
 		content += line
 	return content
 
@@ -162,7 +163,7 @@ def compile_template(src, dest):
 	ensure_path(os.path.dirname(dest))
 	dest_f = open(dest, "w")
 	compiler = Compiler(src_f, dest_f, loader=None)
-	compiler.args = 'ADJ, data, **kwargs'
+	compiler.args = 'data, ADJ, config, **kwargs'
 	compiler.compile()
 	src_f.close()
 	dest_f.close()

@@ -26,18 +26,6 @@ class Processor:
 		self.tpl_path = tpl_path
 		self.context = ProcessorContext()
 
-	def load_template(self, name):
-		loaded = self.loaded_templates.get(name)
-		if loaded:
-			return loaded
-		tpl = Template(
-			name, 
-			os.path.join(self.tpl_path, '{0}.tpl'.format(name)),
-			os.path.join(self.out_path, '__template__', '{0}.tpl.py'.format(name))
-		)
-		self.loaded_templates[name] = tpl
-		return tpl
-
 	def execute(self, action, data):
 		actions = [action]
 		for fn in glob.glob(os.path.join(self.tpl_path, "{0}.*.tpl".format(action))):

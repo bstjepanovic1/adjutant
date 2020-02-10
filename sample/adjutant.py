@@ -1,9 +1,9 @@
-from adjutant.config import add_rule
+from adjutant import config
 
-TEMPLATE_PATH = "src/_template"
+config.template_path = "src/_template"
 
-SOURCE_PATH = "src"
+config.source_path = "src"
 
-BUILD_PATH = "build"
+config.build_path = "build"
 
-add_rule("src/*.h", r'\/\*\**\s+\@(?P<func>.*?)(?P<data>\{.*?\})\s+\*\/')
+config.add_rule("src/*.h", r'\/\*\**\s+\@(?P<template>.*?)(?P<data>\{.*?\})\s+\*\/')
