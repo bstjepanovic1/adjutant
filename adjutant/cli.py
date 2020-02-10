@@ -8,7 +8,8 @@ from adjutant.template import compile_template
 from adjutant.utility import import_file
 
 def command_build_file(args):
-	print(args)
+	proc = Processor(args.source, args.dependency)
+	proc.build()
 
 def command_build(args, basepath):
 	builder = Builder(basepath)
