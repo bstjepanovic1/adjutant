@@ -3,6 +3,7 @@
 # Modified by Boban Stjepanovic
 
 import os
+import tempfile
 from adjutant import config
 from adjutant.utility import import_file, ensure_path, DotDict
 
@@ -146,6 +147,7 @@ class Compiler:
 		self.close_literal()
 		return self.seq
 
+
 def render_template(filename, data, context=None):
 	tpl = import_file(filename)
 	if not tpl:
@@ -155,6 +157,7 @@ def render_template(filename, data, context=None):
 	for line in tpl.render(data, context, config):
 		content += line
 	return content
+
 
 def compile_template(src, dest):
 	if not os.path.exists(src):
@@ -167,3 +170,18 @@ def compile_template(src, dest):
 	compiler.compile()
 	src_f.close()
 	dest_f.close()
+
+
+def render_template_direct(tpl_source, dest, data, context=None):
+	temp_name = next(tempfile._get_candidate_names()) + ".py"
+	tmp_filename = os.path.join(tempfile._get_default_tempdir(), temp_name)
+	compile_template(tpl_source, tmp_filename)
+	content = render_template(tmp_filename, data, context)
+	with open(dest, "w") as f:
+		f.write(content)
+
+def render_system_template(tpl, dest, data, context=None):
+	render_template_direct(get_system_template(tpl), dest, data, context)
+
+def get_system_template(tpl):
+	return os.path.join(os.path.abspath(os.path.dirname(__file__)), 'template', tpl)

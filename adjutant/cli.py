@@ -4,15 +4,19 @@ import argparse
 from adjutant import config
 from adjutant.processor import Processor
 from adjutant.builder import Builder
-from adjutant.template import compile_template
+from adjutant.template import compile_template, render_system_template
 from adjutant.utility import import_file
+
+def command_init(args):
+	print("INIT")
+	render_system_template('adjutant.tpl', os.path.join(args.path, 'adjutant.py'), {})
 
 def command_build_file(args):
 	proc = Processor(args.source, args.dependency)
 	proc.build()
 
-def command_build(args, basepath):
-	builder = Builder(basepath)
+def command_build(args):
+	builder = Builder()
 	builder.build()
 
 def command_compile_template(args):
@@ -53,15 +57,16 @@ def adjutant_cli_main():
 	args = main_parser.parse_args()
 
 	# load configuration
-	basepath = args.path
-	config.base_path = basepath
-	config_filename = os.path.join(basepath, 'adjutant.py')
+	config.base_path = args.path
+	config_filename = os.path.join(config.base_path, 'adjutant.py')
 	if os.path.exists(config_filename):
 		import_file(config_filename)
 
-	if args.command == 'build:file':
+	if args.command == 'init':
+		command_init(args)
+	elif args.command == 'build:file':
 		command_build_file(args)
 	elif args.command == 'build':
-		command_build(args, basepath)
+		command_build(args)
 	elif args.command == 'template:compile':
 		command_compile_template(args)

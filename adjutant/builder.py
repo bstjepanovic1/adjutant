@@ -1,25 +1,24 @@
 import os
 
 from adjutant import config
-from adjutant.template import compile_template, render_template
+from adjutant.template import compile_template, render_template, get_system_template
 from adjutant.utility import ensure_path
 
 
 class Builder:
 
-	def __init__(self, basepath):
-		self.build_path = os.path.join(basepath, config.build_path)
+	def __init__(self):
+		self.build_path = os.path.join(config.base_path, config.build_path)
 		ensure_path(self.build_path)
 
-		self.template_src_path = os.path.join(basepath, config.template_path)
+		self.template_src_path = os.path.join(config.base_path, config.template_path)
 		self.template_path = os.path.join(self.build_path, '__tpl__')
 
-		# build core templates
-		self.coretpl_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'template')
+		# build core coretpl
 		makefile_tpl_filename = os.path.join(self.template_path, '__Makefile.py')
 		if True or not os.path.exists(makefile_tpl_filename):
 			compile_template(
-				os.path.join(self.coretpl_path, 'Makefile.tpl'), makefile_tpl_filename)
+				get_system_template('Makefile.tpl'), makefile_tpl_filename)
 
 		self.create_makefile()
 	
