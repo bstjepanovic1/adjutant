@@ -2,9 +2,19 @@
 
 Python tool for source code generation and processing.
 
+### How it works
+
+Project configuration contains list of rules, what to look for in source code and in which files to look. 
+
+Matched content is then sent to templates which generate new files.
+
 ## Installation
 
 Requires Python3 and Make.
+
+```bash
+pip install git+git://github.com/bstjepanovic1/adjutant
+```
 
 ## Usage
 
