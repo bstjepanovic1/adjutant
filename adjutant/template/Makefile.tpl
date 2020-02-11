@@ -7,21 +7,20 @@ BUILD_DIR = $(BASE_DIR)/{{config.build_path}}
 TPL_DIR = $(BASE_DIR)/{{config.template_path}}
 TPL_SRCS = $(shell find ${TPL_DIR} -type f -name '*.tpl')
 # compile templates to python files
-TPL_PYS = $(patsubst ${TPL_DIR}/%.tpl, $(BUILD_DIR)/__template__/%.tpl.py, $(TPL_SRCS))
+TPL_PYS = $(patsubst ${TPL_DIR}/%.tpl, $(BUILD_DIR)/__tpl__/%.tpl.py, $(TPL_SRCS))
 
 # process all files and make dependencies
-ALL_SRCS = 
 {% for i, rule in enumerate(config._rules) %}
 ALL_SRCS := $(ALL_SRCS) $(shell find $(BASE_DIR)/{{rule[0]}} -type f)
 {% endfor %}
-ALL_DEPS = $(patsubst $(BASE_DIR)/%, $(BUILD_DIR)/%.d, $(ALL_SRCS))
+ALL_DEPS = $(patsubst $(BASE_DIR)/%, $(BUILD_DIR)/__dep__/%.d, $(ALL_SRCS))
 
 all: $(TPL_PYS) $(ALL_DEPS)
 
 # compile templates to python files
-$(BUILD_DIR)/__template__/%.tpl.py: ${TPL_DIR}/%.tpl
+$(BUILD_DIR)/__tpl__/%.tpl.py: ${TPL_DIR}/%.tpl
 	adjutant template:compile $< -o $@
 
 # build files
-$(BUILD_DIR)/%.d: $(BASE_DIR)/%
-	adjutant build:file $< -d $@
+$(BUILD_DIR)/__dep__/%.d: $(BASE_DIR)/%
+	adjutant -p $(BASE_DIR) build:file $< -d $@

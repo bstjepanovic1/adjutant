@@ -1,3 +1,3 @@
 {{ ADJ.output('test-out') }}
 
-This is test (Edit)
+This is `{{data.name}}`

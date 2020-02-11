@@ -19,16 +19,15 @@ def command_compile_template(args):
 	compile_template(args.source, args.output)
 
 def adjutant_cli_main():
-	# load configuration
-	basepath = os.getcwd()
-	config.base_path = basepath
-	config_filename = os.path.join(basepath, 'adjutant.py')
-	if os.path.exists(config_filename):
-		import_file(config_filename)
-
 	# parse arguments
 	main_parser = argparse.ArgumentParser()
+	main_parser.add_argument('--path', '-p', default=os.getcwd())
 	subparsers = main_parser.add_subparsers(dest='command')
+
+	# init command
+	parser = subparsers.add_parser("init", help="""
+		Start new project.
+	""")
 
 	# build command
 	parser = subparsers.add_parser("build", help="""
@@ -52,6 +51,13 @@ def adjutant_cli_main():
 
 	# execute
 	args = main_parser.parse_args()
+
+	# load configuration
+	basepath = args.path
+	config.base_path = basepath
+	config_filename = os.path.join(basepath, 'adjutant.py')
+	if os.path.exists(config_filename):
+		import_file(config_filename)
 
 	if args.command == 'build:file':
 		command_build_file(args)

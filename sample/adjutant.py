@@ -6,4 +6,4 @@ config.source_path = "src"
 
 config.build_path = "build"
 
-config.add_rule("src/*.h", r'\/\*\**\s+\@(?P<template>.*?)(?P<data>\{.*?\})\s+\*\/')
+config.add_rule("src/*.h", r'\/\*\**\s+\@(?P<template>.*?)\s*(?P<data>\{.*?\})\s+\*\/')

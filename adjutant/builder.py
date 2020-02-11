@@ -12,7 +12,7 @@ class Builder:
 		ensure_path(self.build_path)
 
 		self.template_src_path = os.path.join(basepath, config.template_path)
-		self.template_path = os.path.join(self.build_path, '__template__')
+		self.template_path = os.path.join(self.build_path, '__tpl__')
 
 		# build core templates
 		self.coretpl_path = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'template')
