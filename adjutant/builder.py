@@ -37,4 +37,7 @@ class Builder:
 			f.write(content)
 
 	def build(self):
+		if not os.path.exists(self.template_src_path):
+			print("Template sources directory {0} does not exist!".format(self.template_src_path))
+			return
 		os.system("make -C {0}".format(self.build_path))

@@ -39,5 +39,5 @@ Development setup:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python3 setup.py develop
+make install-develop
 ```

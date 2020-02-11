@@ -8,8 +8,12 @@ from adjutant.template import compile_template, render_system_template
 from adjutant.utility import import_file
 
 def command_init(args):
-	print("INIT")
-	render_system_template('adjutant.tpl', os.path.join(args.path, 'adjutant.py'), {})
+	render_system_template(
+		'adjutant.tpl', 
+		os.path.join(args.path, 'adjutant.py'), 
+		vars(args)
+	)
+	print("New project set in: ", args.path)
 
 def command_build_file(args):
 	proc = Processor(args.source, args.dependency)
@@ -32,6 +36,9 @@ def adjutant_cli_main():
 	parser = subparsers.add_parser("init", help="""
 		Start new project.
 	""")
+	parser.add_argument('--source-path', '-s', help='Path to source files', default="src/")
+	parser.add_argument('--template-path', '-t', help='Path to template files', default="template/")
+	parser.add_argument('--build-path', '-b', help='Build path', default="build/")
 
 	# build command
 	parser = subparsers.add_parser("build", help="""
