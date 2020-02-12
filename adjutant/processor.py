@@ -4,7 +4,8 @@ import glob
 from fnmatch import fnmatch
 
 from adjutant import config
-from adjutant.utility import ensure_path, DotDict
+from adjutant.template import render_template
+from adjutant.utility import ensure_path, DotDict, write_file, read_file
 
 
 class ProcessorContext:
@@ -26,12 +27,18 @@ class Processor:
 		self.context = ProcessorContext()
 		self.source = source
 		self.dependency = dependency
-		with open(source, "r") as f:
-			self.content = f.read()
+		self.content = read_file(source)
 
-	def run_pattern(self, re_pattern, callback):
+	def _run_pattern(self, re_pattern, callback):
 		for match in re_pattern.finditer(self.content):
-			print(match.group('template'))
+			callback(self, match)
+
+	def template(self, template_name, data):
+		self.context.reset()
+		content = render_template(config.get_template_script(template_name), data, self.context)
+		if self.context.out_filename:
+			write_file(config.get_build_path(self.context.out_filename), content)
+		return content
 
 	def build(self):
 		for rule in config._rules:
@@ -39,7 +46,7 @@ class Processor:
 			for pat in file_patterns:
 				full = os.path.join(config.base_path, pat)
 				if fnmatch(self.source, full):
-					self.run_pattern(re_pattern, callback)
+					self._run_pattern(re_pattern, callback)
 		ensure_path(os.path.dirname(self.dependency))
-		with open(self.dependency, "w") as f:
-			f.write("Test")
+		#with open(self.dependency, "w") as f:
+		#	f.write("Test")
