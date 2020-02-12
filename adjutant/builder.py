@@ -16,9 +16,12 @@ class Builder:
 
 		# build core coretpl
 		makefile_tpl_filename = os.path.join(self.template_path, '__Makefile.py')
+		dep_tpl_filename = os.path.join(self.template_path, '__dep.py')
 		if True or not os.path.exists(makefile_tpl_filename):
 			compile_template(
 				get_system_template('Makefile.tpl'), makefile_tpl_filename)
+			compile_template(
+				get_system_template('dep.tpl'), dep_tpl_filename)
 
 		self.create_makefile()
 	
@@ -40,4 +43,4 @@ class Builder:
 		if not os.path.exists(self.template_src_path):
 			print("Template sources directory {0} does not exist!".format(self.template_src_path))
 			return
-		os.system("make -C {0}".format(self.build_path))
+		os.system("make -C {0} build".format(self.build_path))

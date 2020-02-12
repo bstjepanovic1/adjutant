@@ -28,6 +28,7 @@ class Processor:
 		self.source = source
 		self.dependency = dependency
 		self.content = read_file(source)
+		self.output_deps = dict()
 
 	def _run_pattern(self, re_pattern, callback):
 		for match in re_pattern.finditer(self.content):
@@ -35,9 +36,12 @@ class Processor:
 
 	def template(self, template_name, data):
 		self.context.reset()
-		content = render_template(config.get_template_script(template_name), data, self.context)
+		tpl_filename = config.get_template_script(template_name)
+		content = render_template(tpl_filename, data, self.context)
 		if self.context.out_filename:
-			write_file(config.get_build_path(self.context.out_filename), content)
+			out_filename = config.get_build_path(self.context.out_filename)
+			write_file(out_filename, content)
+			self.output_deps[out_filename] = [self.source, tpl_filename]
 		return content
 
 	def build(self):
@@ -48,5 +52,7 @@ class Processor:
 				if fnmatch(self.source, full):
 					self._run_pattern(re_pattern, callback)
 		ensure_path(os.path.dirname(self.dependency))
+		print('--')
+		print(self.output_deps)
 		#with open(self.dependency, "w") as f:
 		#	f.write("Test")

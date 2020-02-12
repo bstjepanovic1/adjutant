@@ -15,7 +15,10 @@ ALL_SRCS := $(ALL_SRCS) $(shell find $(BASE_DIR)/{{rule[0]}} -type f)
 {% endfor %}
 ALL_DEPS = $(patsubst $(BASE_DIR)/%, $(BUILD_DIR)/__dep__/%.d, $(ALL_SRCS))
 
-all: $(TPL_PYS) $(ALL_DEPS)
+all:
+	echo "OK"
+
+build: $(TPL_PYS) $(ALL_DEPS)
 
 # compile templates to python files
 $(BUILD_DIR)/__tpl__/%.tpl.py: ${TPL_DIR}/%.tpl
