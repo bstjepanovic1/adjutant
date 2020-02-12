@@ -4,7 +4,7 @@ Python tool for source code generation and processing.
 
 ### How it works
 
-Project configuration contains list of rules, what to look for in source code and in which files to look. 
+Project configuration file (`adjutant.py`) contains list of rules, that specify what to look for in source code and in which files to look. 
 
 Matched content is then sent to templates which generate new files.
 
@@ -21,7 +21,7 @@ pip install git+git://github.com/bstjepanovic1/adjutant
 In your source code directory use init command to create configuration file:
 
 ```bash
-adjutant init
+adjutant initconfiguration
 ```
 
 Setup will ask you where to look for source files and where to perform build.
