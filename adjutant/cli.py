@@ -16,7 +16,7 @@ def command_init(args):
 	print("New project set in: ", args.path)
 
 def command_build_file(args):
-	proc = Processor(args.source, args.dependency)
+	proc = Processor(args.source, args.dependency, args.output)
 	proc.build()
 
 def command_build(args):
@@ -51,6 +51,7 @@ def adjutant_cli_main():
 	""")
 	parser.add_argument("source")
 	parser.add_argument('--dependency', '-d')
+	parser.add_argument("--output", "-o")
 
 	# Compile template command
 	parser = subparsers.add_parser("template:compile", help="""

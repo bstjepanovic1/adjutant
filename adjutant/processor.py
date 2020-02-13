@@ -23,12 +23,14 @@ class ProcessorContext:
 
 class Processor:
 
-	def __init__(self, source, dependency):
+	def __init__(self, source, dependency, output):
 		self.context = ProcessorContext()
 		self.source = source
 		self.dependency = dependency
 		self.content = read_file(source)
+		self.output = output
 		self.output_deps = dict()
+		self.output_deps[output] = [self.source]
 
 	def _run_pattern(self, re_pattern, callback):
 		for match in re_pattern.finditer(self.content):
@@ -49,7 +51,8 @@ class Processor:
 			if self.context.out_filename:
 				out_filename = config.get_build_path(self.context.out_filename)
 				write_file(out_filename, content)
-				self.output_deps[out_filename] = [self.source, tpl]
+				self.output_deps[out_filename] = [self.output]
+				self.output_deps[self.output].append(tpl)
 			all_content += content
 
 		return all_content
@@ -67,3 +70,6 @@ class Processor:
 		depcontent = render_template(
 			config.get_template_script('__dep.py', exact=True), self.output_deps)
 		write_file(self.dependency, depcontent)
+
+		# write output file
+		write_file(self.output, "")

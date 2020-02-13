@@ -28,8 +28,7 @@ $(BUILD_DIR)/__tpl__/%.tpl.py: ${TPL_DIR}/%.tpl
 
 # build files
 $(DEP_DIR)/%.t: $(BASE_DIR)/% $(DEP_DIR)/%.d
-	adjutant -p $(BASE_DIR) build:file $< -d $(word 2,$^)
-	touch $@
+	adjutant -p $(BASE_DIR) build:file $< -d $(word 2,$^) -o $@
 
 $(ALL_DEPS):
 
