@@ -14,9 +14,14 @@ class ProcessorContext:
 	out_filename = None
 	out_part = None
 
-	def output(self, filename, part=None):
+	def output(self, filename):
 		self.out_filename = filename
-		self.out_part = part
+		self.out_part = None
+		return ''
+
+	def output_part(self, filename):
+		self.out_filename = filename
+		self.out_part = True
 		return ''
 
 	def reset(self):
@@ -34,21 +39,28 @@ class Processor:
 		self.output = output
 		self.output_deps = dict()
 		self.output_deps[output] = [self.source]
+		self.generated_files = list()
+
+		# same template called multiple times in one file
+		self.template_d = dict()
 
 	def _run_pattern(self, re_pattern, callback):
 		for match in re_pattern.finditer(self.content):
 			callback(self, match)
 
-	def _template_output(self, content):
+	def _template_output(self, template, content):
 		if self.context.out_filename:
 			part = self.context.out_part
 			if part != None:
 				parts_filename = config.get_build_path(self.context.out_filename + ".part")
 				out_filename = os.path.join(parts_filename, self.source_key)
 				self.output_deps[config.get_build_path(self.context.out_filename)] = [out_filename]
+
 			else:
 				out_filename = config.get_build_path(self.context.out_filename)
+
 			write_file(out_filename, content)
+			self.generated_files.append(out_filename)
 			self.output_deps[out_filename] = [self.output]
 
 	def template(self, template_name, data):
@@ -63,13 +75,22 @@ class Processor:
 		all_content = ""
 		for tpl in templates:
 			content = render_template(tpl, data, self.context)
-			self._template_output(content)
+			self._template_output(tpl, content)
 			all_content += content
 			self.output_deps[self.output].append(tpl)
 
 		return all_content
 
 	def build(self):
+		# cleanup from previous build
+		prev = read_file(self.output)
+		if prev:
+			prev = json.loads(prev)
+			for f in prev.get('out_files'):
+				if os.path.exists(f):
+					os.remove(f)
+
+		# run all applicable rules
 		for rule in config._rules:
 			file_patterns, re_pattern, callback = rule
 			for pat in file_patterns:
@@ -86,4 +107,5 @@ class Processor:
 		# write output file
 		write_file(self.output, json.dumps({
 			'source': self.source,
+			'out_files': self.generated_files,
 		}))

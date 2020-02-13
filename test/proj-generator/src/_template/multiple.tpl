@@ -1,2 +1,2 @@
-{{ ADJ.output('multiple.h', part=True) }}
+{{ ADJ.output_part('multiple.h') }}
 {{data.content}}
