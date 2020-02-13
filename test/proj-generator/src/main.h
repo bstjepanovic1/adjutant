@@ -1,7 +1,7 @@
 /*
  @generate
  {
-   "data": {
+   "object": {
        "color": "green",
        "thing": "nebula"
    }

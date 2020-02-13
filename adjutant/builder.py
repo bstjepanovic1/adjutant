@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 from adjutant import config
 from adjutant.template import compile_template, render_template, get_system_template
@@ -43,4 +44,13 @@ class Builder:
 		if not os.path.exists(self.template_src_path):
 			print("Template sources directory {0} does not exist!".format(self.template_src_path))
 			return
-		os.system("make -C {0} build".format(self.build_path))
+		
+		result = subprocess.run(["make", "-C", self.build_path, "build"], capture_output=True)
+
+		out = result.stdout.decode('utf8')
+		out = out.replace(config.base_path, '.')
+		print(out)
+
+		err = result.stderr.decode('utf8')
+		if err:
+			print(err)

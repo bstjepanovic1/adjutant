@@ -21,7 +21,7 @@ pip install git+git://github.com/bstjepanovic1/adjutant
 In your source code directory use init command to create configuration file:
 
 ```bash
-adjutant initconfiguration
+adjutant init
 ```
 
 Setup will ask you where to look for source files and where to perform build.

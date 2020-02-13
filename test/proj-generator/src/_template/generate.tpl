@@ -1,2 +1,3 @@
 {{ ADJ.output("generated.h") }}
-This is test
+#include "generated-sub.h"
+#define {{data.object.color.upper()}}_{{data.object.thing.upper()}} SUB_TEMPLATE
