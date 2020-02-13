@@ -2,6 +2,7 @@ import os
 import re
 import json
 import glob
+import hashlib
 from fnmatch import fnmatch
 
 from adjutant import config
@@ -11,22 +12,23 @@ from adjutant.utility import ensure_path, DotDict, write_file, read_file
 
 class ProcessorContext:
 	out_filename = None
-	out_combine = False
+	out_part = None
 
-	def output(self, filename, combine=False):
+	def output(self, filename, part=None):
 		self.out_filename = filename
-		self.out_combine = combine
+		self.out_part = part
 		return ''
 
 	def reset(self):
 		self.out_filename = None
-		self.out_combine = False
+		self.out_part = None
 
 class Processor:
 
 	def __init__(self, source, dependency, output):
 		self.context = ProcessorContext()
 		self.source = source
+		self.source_key = hashlib.md5(source.encode('utf8')).hexdigest()[:14]
 		self.dependency = dependency
 		self.content = read_file(source)
 		self.output = output
@@ -36,6 +38,18 @@ class Processor:
 	def _run_pattern(self, re_pattern, callback):
 		for match in re_pattern.finditer(self.content):
 			callback(self, match)
+
+	def _template_output(self, content):
+		if self.context.out_filename:
+			part = self.context.out_part
+			if part != None:
+				parts_filename = config.get_build_path(self.context.out_filename + ".part")
+				out_filename = os.path.join(parts_filename, self.source_key)
+				self.output_deps[config.get_build_path(self.context.out_filename)] = [out_filename]
+			else:
+				out_filename = config.get_build_path(self.context.out_filename)
+			write_file(out_filename, content)
+			self.output_deps[out_filename] = [self.output]
 
 	def template(self, template_name, data):
 		self.context.reset()
@@ -49,12 +63,9 @@ class Processor:
 		all_content = ""
 		for tpl in templates:
 			content = render_template(tpl, data, self.context)
-			if self.context.out_filename:
-				out_filename = config.get_build_path(self.context.out_filename)
-				write_file(out_filename, content)
-				self.output_deps[out_filename] = [self.output]
-				self.output_deps[self.output].append(tpl)
+			self._template_output(content)
 			all_content += content
+			self.output_deps[self.output].append(tpl)
 
 		return all_content
 

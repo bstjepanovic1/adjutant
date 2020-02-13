@@ -13,6 +13,7 @@ def import_file(filename, name=None):
 	return mod
 
 def write_file(filename, content):
+	ensure_path(os.path.dirname(filename))
 	with open(filename, "w") as f:
 		f.write(content)
 

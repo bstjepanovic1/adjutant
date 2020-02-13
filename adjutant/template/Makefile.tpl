@@ -17,10 +17,15 @@ ALL_SRCS := $(ALL_SRCS) $(shell find $(BASE_DIR)/{{rule[0]}} -type f)
 ALL_DEPS = $(patsubst $(BASE_DIR)/%, $(DEP_DIR)/%.d, $(ALL_SRCS))
 ALL_TARGETS = $(patsubst $(BASE_DIR)/%, $(DEP_DIR)/%.t, $(ALL_SRCS))
 
+# merge files in parts
+PARTS = $(shell find ${BUILD_DIR} -type d -name '*.part')
+PARTS_MERGED = $(PARTS:.part=)
+
 all:
 	echo "OK"
 
-build: $(TPL_PYS) $(ALL_TARGETS) $(ALL_DEPS)
+build: $(TPL_PYS) $(ALL_TARGETS) $(PARTS_MERGED)
+
 
 # compile templates to python files
 $(BUILD_DIR)/__tpl__/%.tpl.py: ${TPL_DIR}/%.tpl $(BASE_DIR)/adjutant.py
@@ -31,5 +36,9 @@ $(DEP_DIR)/%.t: $(BASE_DIR)/% $(DEP_DIR)/%.d $(BASE_DIR)/adjutant.py
 	adjutant -p $(BASE_DIR) build:file $< -d $(word 2,$^) -o $@
 
 $(ALL_DEPS):
+
+# Merge multipart files
+$(PARTS_MERGED): % : %.part
+	cat $</* > $@
 
 include $(wildcard $(ALL_DEPS))
