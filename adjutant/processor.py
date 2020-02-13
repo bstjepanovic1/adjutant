@@ -36,13 +36,23 @@ class Processor:
 
 	def template(self, template_name, data):
 		self.context.reset()
-		tpl_filename = config.get_template_script(template_name)
-		content = render_template(tpl_filename, data, self.context)
-		if self.context.out_filename:
-			out_filename = config.get_build_path(self.context.out_filename)
-			write_file(out_filename, content)
-			self.output_deps[out_filename] = [self.source, tpl_filename]
-		return content
+
+		# find all sub-templates
+		templates = [config.get_template_script(template_name)]
+		tpl_filename = config.get_template_script('{0}.*'.format(template_name))
+		for tpl in glob.glob(tpl_filename):
+			templates.append(tpl)
+
+		all_content = ""
+		for tpl in templates:
+			content = render_template(tpl, data, self.context)
+			if self.context.out_filename:
+				out_filename = config.get_build_path(self.context.out_filename)
+				write_file(out_filename, content)
+				self.output_deps[out_filename] = [self.source, tpl]
+			all_content += content
+
+		return all_content
 
 	def build(self):
 		for rule in config._rules:
@@ -51,8 +61,9 @@ class Processor:
 				full = os.path.join(config.base_path, pat)
 				if fnmatch(self.source, full):
 					self._run_pattern(re_pattern, callback)
+	
+		# write dependency file
 		ensure_path(os.path.dirname(self.dependency))
-		print('--')
-		print(self.output_deps)
-		#with open(self.dependency, "w") as f:
-		#	f.write("Test")
+		depcontent = render_template(
+			config.get_template_script('__dep.py', exact=True), self.output_deps)
+		write_file(self.dependency, depcontent)

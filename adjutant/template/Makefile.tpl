@@ -2,6 +2,7 @@
 
 BASE_DIR = {{config.base_path}}
 BUILD_DIR = $(BASE_DIR)/{{config.build_path}}
+DEP_DIR = $(BUILD_DIR)/__dep__
 
 # find all templates
 TPL_DIR = $(BASE_DIR)/{{config.template_path}}
@@ -13,17 +14,23 @@ TPL_PYS = $(patsubst ${TPL_DIR}/%.tpl, $(BUILD_DIR)/__tpl__/%.tpl.py, $(TPL_SRCS
 {% for i, rule in enumerate(config._rules) %}
 ALL_SRCS := $(ALL_SRCS) $(shell find $(BASE_DIR)/{{rule[0]}} -type f)
 {% endfor %}
-ALL_DEPS = $(patsubst $(BASE_DIR)/%, $(BUILD_DIR)/__dep__/%.d, $(ALL_SRCS))
+ALL_DEPS = $(patsubst $(BASE_DIR)/%, $(DEP_DIR)/%.d, $(ALL_SRCS))
+ALL_TARGETS = $(patsubst $(BASE_DIR)/%, $(DEP_DIR)/%.t, $(ALL_SRCS))
 
 all:
 	echo "OK"
 
-build: $(TPL_PYS) $(ALL_DEPS)
+build: $(TPL_PYS) $(ALL_TARGETS) $(ALL_DEPS)
 
 # compile templates to python files
 $(BUILD_DIR)/__tpl__/%.tpl.py: ${TPL_DIR}/%.tpl
 	adjutant template:compile $< -o $@
 
 # build files
-$(BUILD_DIR)/__dep__/%.d: $(BASE_DIR)/%
-	adjutant -p $(BASE_DIR) build:file $< -d $@
+$(DEP_DIR)/%.t: $(BASE_DIR)/% $(DEP_DIR)/%.d
+	adjutant -p $(BASE_DIR) build:file $< -d $(word 2,$^)
+	touch $@
+
+$(ALL_DEPS):
+
+include $(wildcard $(ALL_DEPS))
