@@ -23,11 +23,11 @@ all:
 build: $(TPL_PYS) $(ALL_TARGETS) $(ALL_DEPS)
 
 # compile templates to python files
-$(BUILD_DIR)/__tpl__/%.tpl.py: ${TPL_DIR}/%.tpl
+$(BUILD_DIR)/__tpl__/%.tpl.py: ${TPL_DIR}/%.tpl $(BASE_DIR)/adjutant.py
 	adjutant template:compile $< -o $@
 
 # build files
-$(DEP_DIR)/%.t: $(BASE_DIR)/% $(DEP_DIR)/%.d
+$(DEP_DIR)/%.t: $(BASE_DIR)/% $(DEP_DIR)/%.d $(BASE_DIR)/adjutant.py
 	adjutant -p $(BASE_DIR) build:file $< -d $(word 2,$^) -o $@
 
 $(ALL_DEPS):

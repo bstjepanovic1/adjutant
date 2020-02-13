@@ -1,5 +1,6 @@
 import os
 import re
+import json
 import glob
 from fnmatch import fnmatch
 
@@ -72,4 +73,6 @@ class Processor:
 		write_file(self.dependency, depcontent)
 
 		# write output file
-		write_file(self.output, "")
+		write_file(self.output, json.dumps({
+			'source': self.source,
+		}))
