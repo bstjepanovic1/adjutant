@@ -1,5 +1,7 @@
 # Adjutant
 
+**WORK IN PROGRESS**
+
 Python tool for source code generation and processing.
 
 ### How it works
