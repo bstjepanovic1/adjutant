@@ -15,7 +15,10 @@ class Config:
 	def add_rule(self, file_patterns, re_pattern, callback=None):
 		if re_pattern:
 			re_pattern = re.compile(re_pattern, re.DOTALL | re.MULTILINE)
-		self._rules.append((file_patterns, re_pattern, callback))
+		self._rules.append((
+			[file_patterns] if isinstance(file_patterns, str) else file_patterns, 
+			re_pattern, callback
+		))
 
 	def get_path(self, p):
 		return os.path.join(self.base_path, p)
