@@ -19,7 +19,7 @@ def write_file(filename, content):
 
 def read_file(filename, empty_content=''):
 	if not os.path.exists(filename):
-		return content
+		return empty_content
 	with open(filename, "r") as f:
 		return f.read()
 
