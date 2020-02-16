@@ -19,9 +19,9 @@ class ProcessorContext:
 		self.out_part = None
 		return ''
 
-	def output_part(self, filename):
+	def output_part(self, filename, order=None):
 		self.out_filename = filename
-		self.out_part = True
+		self.out_part = { 'order': 'Z' if order == None else order }
 		return ''
 
 	def reset(self):
@@ -41,19 +41,19 @@ class Processor:
 		self.output_deps[output] = [self.source]
 		self.generated_files = list()
 
-		# same template called multiple times in one file
 		self.template_d = dict()
 
-	def _run_pattern(self, re_pattern, callback):
-		for match in re_pattern.finditer(self.content):
-			callback(self, match)
-
 	def _template_output(self, template, content):
+		tpl_d = self.template_d.get(template, dict())
+
 		if self.context.out_filename:
 			part = self.context.out_part
 			if part != None:
+				occurence = tpl_d.get('occurence', 0) + 1
+				tpl_d['occurence'] = occurence
+				order = part.get('order')
 				parts_filename = config.get_build_path(self.context.out_filename + ".part")
-				out_filename = os.path.join(parts_filename, self.source_key)
+				out_filename = os.path.join(parts_filename, '{0}_{1}_{2}'.format(order, self.source_key, occurence))
 				self.output_deps[config.get_build_path(self.context.out_filename)] = [out_filename]
 
 			else:
@@ -62,6 +62,8 @@ class Processor:
 			write_file(out_filename, content)
 			self.generated_files.append(out_filename)
 			self.output_deps[out_filename] = [self.output]
+		
+		self.template_d[template] = tpl_d
 
 	def template(self, template_name, data):
 		self.context.reset()
@@ -81,9 +83,13 @@ class Processor:
 
 		return all_content
 
+	def _run_pattern(self, re_pattern, callback):
+		for match in re_pattern.finditer(self.content):
+			callback(self, match)
+
 	def build(self):
 		# cleanup from previous build
-		prev = read_file(self.output)
+		prev = read_file(self.output, empty_content=None)
 		if prev:
 			prev = json.loads(prev)
 			for f in prev.get('out_files'):
@@ -97,7 +103,7 @@ class Processor:
 				full = os.path.join(config.base_path, pat)
 				if fnmatch(self.source, full):
 					self._run_pattern(re_pattern, callback)
-	
+
 		# write dependency file
 		ensure_path(os.path.dirname(self.dependency))
 		depcontent = render_template(
