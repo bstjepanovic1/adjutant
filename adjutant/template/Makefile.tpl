@@ -13,7 +13,7 @@ TPL_PYS = $(patsubst ${TPL_DIR}/%.tpl, $(BUILD_DIR)/__tpl__/%.tpl.py, $(TPL_SRCS
 # process all files and make dependencies
 {% for i, rule in enumerate(config._rules) %}
 {% for pat in rule[0] %}
-ALL_SRCS := $(ALL_SRCS) $(shell find $(BASE_DIR)/{{pat}} -type f)
+ALL_SRCS := $(ALL_SRCS) $(shell find $(BASE_DIR) -name {{pat}} -type f)
 {% endfor %}
 {% endfor %}
 ALL_DEPS = $(patsubst $(BASE_DIR)/%, $(DEP_DIR)/%.d, $(ALL_SRCS))
