@@ -12,12 +12,12 @@ class Config:
 	def __init__(self):
 		self._rules = []
 
-	def add_rule(self, file_patterns, re_pattern, callback=None):
-		if re_pattern:
-			re_pattern = re.compile(re_pattern, re.DOTALL | re.MULTILINE)
+	def add_rule(self, file_patterns, callback=None, text_pattern=None, read_file=False):
+		if text_pattern:
+			text_pattern = re.compile(text_pattern, re.DOTALL | re.MULTILINE)
 		self._rules.append((
 			[file_patterns] if isinstance(file_patterns, str) else file_patterns, 
-			re_pattern, callback
+			text_pattern, callback, True if text_pattern else read_file
 		))
 
 	def get_path(self, p):

@@ -12,4 +12,11 @@ def run_template(processor, match):
 
 config.add_rule(
     "src/*.h", 
-    r'\/\*\**\s+\@(?P<template>.*?)\s*(?P<data>\{.*?\})\s+\*\/', run_template)
+    run_template, 
+    r'\/\*\**\s+\@(?P<template>.*?)\s*(?P<data>\{.*?\})\s+\*\/'
+)
+
+def command_rule(processor):
+    print("Found command rule", processor.source)
+
+config.add_rule("src/*.b", command_rule)

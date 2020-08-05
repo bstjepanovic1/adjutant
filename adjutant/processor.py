@@ -35,7 +35,7 @@ class Processor:
 		self.source = source
 		self.source_key = hashlib.md5(source.encode('utf8')).hexdigest()[:14]
 		self.dependency = dependency
-		self.content = read_file(source)
+		self.content = None
 		self.output = output
 		self.output_deps = dict()
 		self.output_deps[output] = [self.source]
@@ -84,6 +84,9 @@ class Processor:
 		return all_content
 
 	def _run_pattern(self, re_pattern, callback):
+		if not re_pattern:
+			callback(self)
+			return
 		for match in re_pattern.finditer(self.content):
 			callback(self, match)
 
@@ -98,10 +101,12 @@ class Processor:
 
 		# run all applicable rules
 		for rule in config._rules:
-			file_patterns, re_pattern, callback = rule
+			file_patterns, re_pattern, callback, read_content = rule
 			for pat in file_patterns:
 				full = os.path.join(config.base_path, pat)
 				if fnmatch(self.source, full):
+					if read_content and not self.content:
+						self.content = read_file(self.source)
 					self._run_pattern(re_pattern, callback)
 
 		# write dependency file
